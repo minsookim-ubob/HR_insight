@@ -1,0 +1,6 @@
+{
+  "name": "Sales HR & CRM System",
+  "description": "HR and CRM dashboard for managing sales representatives and tracking performance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
