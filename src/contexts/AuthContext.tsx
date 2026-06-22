@@ -26,7 +26,7 @@ const INITIAL_USERS: UserAuth[] = [
   },
   {
     id: 'minsookim@ubob.com',
-    passwordHash: '1234!', 
+    passwordHash: '1234',
     isMaster: true,
     status: 'active',
     failedAttempts: 0,
@@ -36,6 +36,34 @@ const INITIAL_USERS: UserAuth[] = [
     history: [{ date: new Date().toISOString(), action: 'Master account created' }]
   }
 ];
+
+const PROTECTED_MASTER_ACCOUNTS: Record<string, string> = {
+  'minsookim@ubob.com': '1234',
+};
+
+function ensureProtectedMasterAccounts(users: UserAuth[]): UserAuth[] {
+  return users.map((u) => {
+    const defaultPassword = PROTECTED_MASTER_ACCOUNTS[u.id];
+    if (!defaultPassword) return u;
+
+    const needsRepair =
+      !u.isMaster ||
+      u.status !== 'active' ||
+      u.failedAttempts > 0 ||
+      u.passwordHash === '1234!';
+
+    if (!needsRepair) return u;
+
+    return {
+      ...u,
+      passwordHash: defaultPassword,
+      isMaster: true,
+      status: 'active',
+      failedAttempts: 0,
+      resetRequestedAt: null,
+    };
+  });
+}
 
 interface AuthContextType {
   user: UserAuth | null;
@@ -83,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (minsooIdx === -1) {
       initial.push({
         id: 'minsookim@ubob.com',
-        passwordHash: '1234!', 
+        passwordHash: '1234',
         isMaster: true,
         status: 'active',
         failedAttempts: 0,
@@ -93,6 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         history: [{ date: new Date().toISOString(), action: 'Master fallback created' }]
       });
     }
+
+    initial = ensureProtectedMasterAccounts(initial);
     
     localStorage.setItem('system_users', JSON.stringify(initial));
     
