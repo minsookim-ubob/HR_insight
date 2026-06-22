@@ -46,21 +46,28 @@ function ensureProtectedMasterAccounts(users: UserAuth[]): UserAuth[] {
     const defaultPassword = PROTECTED_MASTER_ACCOUNTS[u.id];
     if (!defaultPassword) return u;
 
+    const isLockedOut = u.status === 'blocked' || u.failedAttempts >= 3;
     const needsRepair =
       !u.isMaster ||
       u.status !== 'active' ||
       u.failedAttempts > 0 ||
       u.passwordHash === '1234!';
 
-    if (!needsRepair) return u;
+    if (!needsRepair && !isLockedOut) return u;
 
     return {
       ...u,
-      passwordHash: defaultPassword,
+      passwordHash: isLockedOut || u.passwordHash === '1234!' ? defaultPassword : u.passwordHash,
       isMaster: true,
       status: 'active',
       failedAttempts: 0,
       resetRequestedAt: null,
+      history: [
+        ...(u.history || []),
+        ...(isLockedOut
+          ? [{ date: new Date().toISOString(), action: 'Account unlocked (password lock cleared)' }]
+          : []),
+      ],
     };
   });
 }
