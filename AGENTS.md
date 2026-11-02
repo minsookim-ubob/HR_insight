@@ -1,5 +1,13 @@
 # Project Instructions & Pending Ideas
 
+## Cursor Cloud specific instructions
+
+- 의존성 설치는 `npm ci`, 개발 서버는 `npm run dev`입니다. Express와 Vite가 포트 3000에서 함께 뜹니다.
+- `firebase-applet-config.json`은 저장소에 없습니다. 이 파일이 없으면 Vite가 `src/services/firebase.ts`의 import를 해석하지 못해 개발 서버가 기동하지 않습니다. 로컬 스텁(`apiKey`, `projectId` 등)만 있어도 UI는 뜹니다. Firestore 조회는 실패하고 팀원 데이터는 `src/data.ts`로 폴백됩니다. 이 스텁은 커밋하지 마세요.
+- 로그인은 Firebase Auth가 아니라 브라우저 `localStorage`입니다. 초기 마스터 계정은 `minsookim@ubob.com` / `1234`이며, 첫 로그인 시 8자 이상 비밀번호 변경이 강제됩니다.
+- `GEMINI_API_KEY`는 `/api/gemini/*`에만 필요하고, SMTP 변수는 `/api/send-update-email`에만 필요합니다. 앱 기동과 로그인에는 없어도 됩니다.
+- `npm run lint`(`tsc --noEmit`)는 `TeamRoster.tsx`, `KpiSessions.tsx`, `encryption.ts`의 기존 타입 오류로 실패합니다. `npm run build`는 성공합니다.
+
 ## Pending Backend Architecture Improvements
 해당 내용은 추후 백엔드(서버 및 데이터베이스) 셋팅 시 반영해야 하는 미결제 사항입니다. 백엔드 구성 작업 시 사용자에게 다음 내용의 구현을 제안하십시오:
 
